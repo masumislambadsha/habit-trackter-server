@@ -71,6 +71,34 @@ async function run() {
       }
     });
 
+    // public api
+    app.get("/habits/public", async (req, res) => {
+      try {
+        const { search, category, limit = 100 } = req.query;
+        let query = { public: true };
+
+        if (search) {
+          query.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+          ];
+        }
+        if (category) {
+          query.category = category;
+        }
+
+        const cursor = habitsCollection
+          .find(query)
+          .sort({ createdAt: -1 })
+          .limit(parseInt(limit));
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching public habits:", error);
+        res.status(500).send({ error: "Failed to fetch public habits" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
