@@ -148,6 +148,19 @@ async function run() {
       }
     });
 
+    // my habit api
+    app.get("/habits/my", verifyFirebaseToken, async (req, res) => {
+      try {
+        const userId = req.user_uid;
+        const cursor = habitsCollection.find({ userId }).sort({ createdAt: -1 });
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching user habits:", error);
+        res.status(500).send({ error: "Failed to fetch user habits" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
