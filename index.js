@@ -161,6 +161,36 @@ async function run() {
       }
     });
 
+     // update api
+    app.patch("/habits/:id", verifyFirebaseToken, async (req, res) => {
+      try {
+        const id = req.params.id;
+        const userId = req.user_uid;
+        const habit = await habitsCollection.findOne({ _id: new ObjectId(id) });
+
+        if (!habit) return res.status(404).send({ error: "Habit not found" });
+        if (habit.userId !== userId) return res.status(403).send({ error: "You can only update your own habits" });
+
+        const { title, description, category, reminderTime, image } = req.body;
+        const update = {
+          $set: {
+            title: title || habit.title,
+            description: description || habit.description,
+            category: category || habit.category,
+            reminderTime: reminderTime || habit.reminderTime,
+            image: image !== undefined ? image : habit.image,
+            updatedAt: new Date(),
+          },
+        };
+
+        await habitsCollection.updateOne({ _id: new ObjectId(id) }, update);
+        res.send({ success: true, message: "Habit updated successfully" });
+      } catch (error) {
+        console.error("Error updating habit:", error);
+        res.status(500).send({ error: "Failed to update habit" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
