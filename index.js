@@ -254,6 +254,49 @@ async function run() {
       }
     });
 
+    // user info api
+    app.get("/habits/analytics/user", verifyFirebaseToken, async (req, res) => {
+      try {
+        const userId = req.user_uid;
+        const habits = await habitsCollection.find({ userId }).toArray();
+
+        const last30DaysData = [];
+        for (let i = 0; i < 30; i++) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          date.setHours(0, 0, 0, 0);
+
+          let completedCount = 0;
+          habits.forEach((habit) => {
+            const completed = habit.completionHistory.some((h) => {
+              const completionDate = new Date(h);
+              completionDate.setHours(0, 0, 0, 0);
+              return isSameDay(completionDate, date);
+            });
+            if (completed) completedCount++;
+          });
+
+          last30DaysData.unshift({
+            date: date.toLocaleDateString(),
+            completed: completedCount,
+          });
+        }
+
+        const totalCompletions = habits.reduce((sum, habit) => sum + habit.completionHistory.length, 0);
+        const maxStreak = Math.max(0, ...habits.map((h) => calculateStreak(h.completionHistory)));
+
+        res.send({
+          last30DaysData,
+          totalCompletions,
+          maxStreak,
+          totalHabits: habits.length,
+        });
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+        res.status(500).send({ error: "Failed to fetch analytics" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
