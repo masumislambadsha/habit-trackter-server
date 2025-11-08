@@ -191,6 +191,24 @@ async function run() {
       }
     });
 
+    // delete api
+    app.delete("/habits/:id", verifyFirebaseToken, async (req, res) => {
+      try {
+        const id = req.params.id;
+        const userId = req.user_uid;
+        const habit = await habitsCollection.findOne({ _id: new ObjectId(id) });
+
+        if (!habit) return res.status(404).send({ error: "Habit not found" });
+        if (habit.userId !== userId) return res.status(403).send({ error: "You can only delete your own habits" });
+
+        await habitsCollection.deleteOne({ _id: new ObjectId(id) });
+        res.send({ success: true, message: "Habit deleted successfully" });
+      } catch (error) {
+        console.error("Error deleting habit:", error);
+        res.status(500).send({ error: "Failed to delete habit" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
