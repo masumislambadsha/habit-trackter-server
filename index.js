@@ -99,6 +99,21 @@ async function run() {
       }
     });
 
+     // single api
+    app.get("/habits/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const result = await habitsCollection.findOne({ _id: new ObjectId(id) });
+        if (!result) {
+          return res.status(404).send({ error: "Habit not found" });
+        }
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching habit:", error);
+        res.status(500).send({ error: "Failed to fetch habit" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
