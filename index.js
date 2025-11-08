@@ -66,9 +66,7 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
-        console.error("Error fetching featured habits:", error);
-        res.status(500).send({ error: "Failed to fetch featured habits" });
-      }
+        console.error("Error fetching featured habits:", error);}
     });
 
     // public api
@@ -99,11 +97,13 @@ async function run() {
       }
     });
 
-     // single api
+    // single api
     app.get("/habits/:id", async (req, res) => {
       try {
         const id = req.params.id;
-        const result = await habitsCollection.findOne({ _id: new ObjectId(id) });
+        const result = await habitsCollection.findOne({
+          _id: new ObjectId(id),
+        });
         if (!result) {
           return res.status(404).send({ error: "Habit not found" });
         }
@@ -117,7 +117,16 @@ async function run() {
     // create habit api
     app.post("/habits", verifyFirebaseToken, async (req, res) => {
       try {
-        const { title, description, category, reminderTime, image, userName, userEmail, public: isPublic } = req.body;
+        const {
+          title,
+          description,
+          category,
+          reminderTime,
+          image,
+          userName,
+          userEmail,
+          public: isPublic,
+        } = req.body;
         const userId = req.user_uid;
 
         if (!title || !description || !category) {
@@ -141,7 +150,12 @@ async function run() {
         };
 
         const result = await habitsCollection.insertOne(newHabit);
-        res.status(201).send({ success: true, habit: { _id: result.insertedId, ...newHabit } });
+        res
+          .status(201)
+          .send({
+            success: true,
+            habit: { _id: result.insertedId, ...newHabit },
+          });
       } catch (error) {
         console.error("Error creating habit:", error);
         res.status(500).send({ error: "Failed to create habit" });
@@ -152,7 +166,9 @@ async function run() {
     app.get("/habits/my", verifyFirebaseToken, async (req, res) => {
       try {
         const userId = req.user_uid;
-        const cursor = habitsCollection.find({ userId }).sort({ createdAt: -1 });
+        const cursor = habitsCollection
+          .find({ userId })
+          .sort({ createdAt: -1 });
         const result = await cursor.toArray();
         res.send(result);
       } catch (error) {
@@ -161,7 +177,7 @@ async function run() {
       }
     });
 
-     // update api
+    // update api
     app.patch("/habits/:id", verifyFirebaseToken, async (req, res) => {
       try {
         const id = req.params.id;
@@ -169,7 +185,10 @@ async function run() {
         const habit = await habitsCollection.findOne({ _id: new ObjectId(id) });
 
         if (!habit) return res.status(404).send({ error: "Habit not found" });
-        if (habit.userId !== userId) return res.status(403).send({ error: "You can only update your own habits" });
+        if (habit.userId !== userId)
+          return res
+            .status(403)
+            .send({ error: "You can only update your own habits" });
 
         const { title, description, category, reminderTime, image } = req.body;
         const update = {
@@ -199,7 +218,10 @@ async function run() {
         const habit = await habitsCollection.findOne({ _id: new ObjectId(id) });
 
         if (!habit) return res.status(404).send({ error: "Habit not found" });
-        if (habit.userId !== userId) return res.status(403).send({ error: "You can only delete your own habits" });
+        if (habit.userId !== userId)
+          return res
+            .status(403)
+            .send({ error: "You can only delete your own habits" });
 
         await habitsCollection.deleteOne({ _id: new ObjectId(id) });
         res.send({ success: true, message: "Habit deleted successfully" });
@@ -216,7 +238,8 @@ async function run() {
         const habit = await habitsCollection.findOne({ _id: new ObjectId(id) });
 
         if (!habit) return res.status(404).send({ error: "Habit not found" });
-        if (habit.userId !== userId) return res.status(403).send({ error: "Unauthorized" });
+        if (habit.userId !== userId)
+          return res.status(403).send({ error: "Unauthorized" });
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -282,8 +305,14 @@ async function run() {
           });
         }
 
-        const totalCompletions = habits.reduce((sum, habit) => sum + habit.completionHistory.length, 0);
-        const maxStreak = Math.max(0, ...habits.map((h) => calculateStreak(h.completionHistory)));
+        const totalCompletions = habits.reduce(
+          (sum, habit) => sum + habit.completionHistory.length,
+          0
+        );
+        const maxStreak = Math.max(
+          0,
+          ...habits.map((h) => calculateStreak(h.completionHistory))
+        );
 
         res.send({
           last30DaysData,
