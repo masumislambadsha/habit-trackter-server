@@ -209,6 +209,51 @@ async function run() {
       }
     });
 
+    app.patch("/habits/:id/complete", verifyFirebaseToken, async (req, res) => {
+      try {
+        const id = req.params.id;
+        const userId = req.user_uid;
+        const habit = await habitsCollection.findOne({ _id: new ObjectId(id) });
+
+        if (!habit) return res.status(404).send({ error: "Habit not found" });
+        if (habit.userId !== userId) return res.status(403).send({ error: "Unauthorized" });
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const alreadyCompletedToday = habit.completionHistory.some((date) => {
+          const completionDate = new Date(date);
+          completionDate.setHours(0, 0, 0, 0);
+          return isSameDay(completionDate, today);
+        });
+
+        if (alreadyCompletedToday) {
+          return res.status(400).send({ error: "Already completed today" });
+        }
+
+        const newCompletionHistory = [...habit.completionHistory, new Date()];
+        const newStreak = calculateStreak(newCompletionHistory);
+
+        const update = {
+          $set: {
+            completionHistory: newCompletionHistory,
+            streak: newStreak,
+            updatedAt: new Date(),
+          },
+        };
+
+        await habitsCollection.updateOne({ _id: new ObjectId(id) }, update);
+        res.send({
+          success: true,
+          completionHistory: newCompletionHistory,
+          streak: newStreak,
+        });
+      } catch (error) {
+        console.error("Error marking habit complete:", error);
+        res.status(500).send({ error: "Failed to mark habit complete" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
