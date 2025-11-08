@@ -114,6 +114,40 @@ async function run() {
       }
     });
 
+    // create habit api
+    app.post("/habits", verifyFirebaseToken, async (req, res) => {
+      try {
+        const { title, description, category, reminderTime, image, userName, userEmail, public: isPublic } = req.body;
+        const userId = req.user_uid;
+
+        if (!title || !description || !category) {
+          return res.status(400).send({ message: "Missing required fields" });
+        }
+
+        const newHabit = {
+          title,
+          description,
+          category,
+          reminderTime: reminderTime || "09:00",
+          image: image || "",
+          userName,
+          userEmail,
+          userId,
+          public: isPublic !== undefined ? isPublic : true,
+          completionHistory: [],
+          streak: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const result = await habitsCollection.insertOne(newHabit);
+        res.status(201).send({ success: true, habit: { _id: result.insertedId, ...newHabit } });
+      } catch (error) {
+        console.error("Error creating habit:", error);
+        res.status(500).send({ error: "Failed to create habit" });
+      }
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
