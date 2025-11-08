@@ -18,6 +18,26 @@ admin.initializeApp({
 app.use(cors());
 app.use(express.json());
 
+const verifyFirebaseToken = async (req, res, next) => {
+  // if (!req.headers.authorization) {
+  //   return res.status(401).send({ message: "Unauthorized - No token" });
+  // }
+  // const token = req.headers.authorization.split(" ")[1];
+  // if (!token) {
+  //   return res.status(401).send({ message: "Unauthorized - Token missing" });
+  // }
+  // try {
+  //   const userInfo = await admin.auth().verifyIdToken(token);
+  //   req.user_uid = userInfo.uid;
+  //   req.user_email = userInfo.email;
+  //   req.user_name = userInfo.name;
+  //   next();
+  // } catch (error) {
+  //   return res.status(401).send({ message: "Unauthorized - Invalid token" });
+  // }
+  next();
+};
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.tadlde2.mongodb.net/habitTracker?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   serverApi: {
