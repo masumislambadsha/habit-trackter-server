@@ -1,6 +1,6 @@
-require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+require("dotenv").config();
 const fs = require("fs");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const admin = require("firebase-admin");
@@ -8,16 +8,21 @@ const admin = require("firebase-admin");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const serviceAccount = JSON.parse(
-  fs.readFileSync("./habit-track-admin-sdk.json", "utf8")
-);
+// index.js
+const decoded = Buffer.from(process.env.FIREBASE_SERVICE_KEY, "base64").toString("utf8");
+const serviceAccount = JSON.parse(decoded);
+
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "https://habit-tracker-54432.web.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
   })
 );
@@ -69,7 +74,6 @@ const client = new MongoClient(uri, {
 let habitsCollection;
 
 async function run() {
-  await client.connect();;
   const db = client.db("habitTracker");
       habitsCollection = db.collection("public_habits");
       console.log("MongoDB connected");

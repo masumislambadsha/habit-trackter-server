@@ -1,3 +1,4 @@
 .env
 habit-track-admin-sdk.json
 node_modules
+.vercel
