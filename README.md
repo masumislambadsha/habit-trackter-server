@@ -1,4 +1,4 @@
-# Habit Trackter Server 🚀
+# ☢️ HABIT TRACKER CLIENT — ENTER IF YOU DARE
 
 Welcome to **Habit Trackter Server** – your ultimate backend solution for building robust, scalable, and secure habit tracking applications! This server powers the experience for users who want to cultivate healthy habits, stay accountable, and visualize their progress with ease.
 
