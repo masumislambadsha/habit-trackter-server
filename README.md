@@ -68,8 +68,8 @@ The server should now be running on `http://localhost:3000` (or your configured 
 
 - **Node.js & Express.js** – High-performance, asynchronous backend.
 - **MongoDB (Mongoose)** – Fast and flexible NoSQL database for user and habit data.
-- **JWT & bcrypt** – Secure authentication and password management.
-- **Modern JS/TS** – Written in clean, modular JavaScript or TypeScript.
+- **Firebase Authentication and Admin SDK** – Secure authentication and password management.
+- **Modern JSX** – Written in clean, modular JavaScript or TypeScript.
 
 ---
 
