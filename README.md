@@ -1,4 +1,4 @@
-# ☢️ HABIT TRACKER CLIENT — ENTER IF YOU DARE
+# ☢️ HABIT TRACKER SERVER — ENTER IF YOU DARE
 
 Welcome to **Habit Trackter Server** – your ultimate backend solution for building robust, scalable, and secure habit tracking applications! This server powers the experience for users who want to cultivate healthy habits, stay accountable, and visualize their progress with ease.
 
@@ -120,9 +120,8 @@ This project is licensed under the [MIT License](LICENSE).
 ## 🤝 Connect
 
 - GitHub: [masumislambadsha](https://github.com/masumislambadsha)
-- Twitter: [@yourusername](https://twitter.com/yourusername)
-- Email: your.email@example.com
-
+ Facebook: [@masum.badsha.420](https://facebook.com/masum.badsha.420/)
+- Email: [nkfhhdndjdh@email.com](mailto:nkfhhdndjdh@email.com)
 ---
 
 > “Success is the sum of small efforts, repeated day in and day out.” – Robert Collier
